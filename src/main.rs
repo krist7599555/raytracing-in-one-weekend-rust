@@ -35,7 +35,7 @@ fn main() {
         let t = 0.3 * (ray.unit_direction().y + 1.0);
         let white_color = vector![1.0, 1.0, 1.0];
         let blue_color = vector![0.5, 0.7, 1.0];
-        return (1.0 - t) * white_color + t * blue_color; // linear bleanding
+        return white_color.lerp(&blue_color, t); // Linear interpolation
     }
 
     for u in (0..ny).map(|i| i as f32 / ny as f32).rev() {
