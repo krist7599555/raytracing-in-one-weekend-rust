@@ -174,7 +174,10 @@ fn main() {
             let v = v + (rng.gen::<f32>() / (ny as f32));
             color(&camera.get_ray(u, v), &meshs)
         }).sum::<Vec3>() / (num_sample as f32);
-        let rgb: Vec3 = average_color.map(|f| (f * 255.99).floor());
+        let gamma = 2;
+        let rgb: Vec3 = average_color
+            .map(|f| f.powf(1.0 / gamma as f32))
+            .map(|f| (f * 255.99).floor());
         writeln!(&mut w, "{:.0} {:.0} {:.0}", rgb.x, rgb.y, rgb.z).unwrap();
     }}
 }
