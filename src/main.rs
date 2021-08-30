@@ -70,7 +70,7 @@ impl RayHitable for Sphere {
             let t_pos = (-quadratic_b - discriminant.sqrt()) / (2.0 * quadratic_a);
             let t_neg = (-quadratic_b - discriminant.sqrt()) / (2.0 * quadratic_a);
             let t = t_pos.max(t_neg);
-            if t <= 0.0 || t >= f32::INFINITY { return None }
+            if t <= 0.001 || t >= f32::INFINITY { return None }
             let hit_surface = ray.point_at_parameter(t);
             return Some(HitRecord {
                 t: t,
