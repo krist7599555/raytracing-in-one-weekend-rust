@@ -251,8 +251,8 @@ fn color(ray: &Ray, meshs: &Vec<Box<&Mesh>>, depth: u32) -> Vec3 {
 fn main() {
     let mut w = File::create("image.ppm").unwrap();
 
-    let nx = 300;
-    let ny = 150;
+    let nx = 200;
+    let ny = 100;
 
     writeln!(&mut w, "P3").unwrap();
     writeln!(&mut w, "{} {}", nx, ny).unwrap();
@@ -274,7 +274,7 @@ fn main() {
 
     for v in (0..ny).map(|i| i as f32 / ny as f32).rev() {
     for u in (0..nx).map(|i| i as f32 / nx as f32) {
-        let num_sample = 20;
+        let num_sample = 6;
         let mut rng = rand::thread_rng();
         let average_color = (0..num_sample).map(|_| {
             let u = u + (rng.gen_range(0.0..1.0) / (nx as f32));
