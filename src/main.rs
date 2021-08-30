@@ -11,6 +11,9 @@ impl Ray {
     fn point_at_parameter(&self, t: f32) -> Vec3 {
         return self.origin + self.direction * t;
     }
+    fn unit_direction(&self) -> Vec3 {
+        self.direction.normalize()
+    }
 }
 
 fn main() {
@@ -23,9 +26,25 @@ fn main() {
     writeln!(&mut w, "{} {}", nx, ny).unwrap();
     writeln!(&mut w, "{}", 255).unwrap();
 
-    for j in (0..ny).map(|i| i as f32 / ny as f32).rev() {
-    for i in (0..nx).map(|i| i as f32 / nx as f32) {
-        let rgb: Vec3 = vector![i, j, 0.2] * 255.0;
+    let lower_left_coner: Vec3 = vector![-2.0, -1.0, -1.0];
+    let horizontal: Vec3 = vector![4.0, 0.0, 0.0];
+    let vertical: Vec3 = vector![0.0, 2.0, 0.0];
+    let origin: Vec3 = vector![0.0, 0.0, 0.0];
+
+    fn color(ray: &Ray) -> Vec3 {
+        let t = 0.3 * (ray.unit_direction().y + 1.0);
+        let white_color = vector![1.0, 1.0, 1.0];
+        let blue_color = vector![0.5, 0.7, 1.0];
+        return (1.0 - t) * white_color + t * blue_color; // linear bleanding
+    }
+
+    for u in (0..ny).map(|i| i as f32 / ny as f32).rev() {
+    for v in (0..nx).map(|i| i as f32 / nx as f32) {
+        let ray = Ray {
+            origin, 
+            direction: lower_left_coner + u * horizontal + v * vertical
+        };
+        let rgb: Vec3 = color(&ray) * 255.99;
         writeln!(&mut w, "{:.0} {:.0} {:.0}", rgb.x, rgb.y, rgb.z).unwrap();
     }}
 }
