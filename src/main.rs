@@ -117,7 +117,11 @@ impl Default for Camera {
 fn random_in_unit_sphere() -> Vec3 {
     let mut rng = rand::thread_rng();
     loop {
-        let p: Vec3 = vector![rng.gen::<f32>(), rng.gen::<f32>(), rng.gen::<f32>()].add_scalar(-0.5) * 2.0;
+        let p: Vec3 = vector![
+            rng.gen_range(-1.0..1.0), 
+            rng.gen_range(-1.0..1.0),
+            rng.gen_range(-1.0..1.0)
+        ];
         if p.magnitude_squared() < 1.0 {
             return p;
         }
@@ -167,11 +171,11 @@ fn main() {
 
     for v in (0..ny).map(|i| i as f32 / ny as f32).rev() {
     for u in (0..nx).map(|i| i as f32 / nx as f32) {
-        let num_sample = 10;
+        let num_sample = 6;
         let mut rng = rand::thread_rng();
         let average_color = (0..num_sample).map(|_| {
-            let u = u + (rng.gen::<f32>() / (nx as f32));
-            let v = v + (rng.gen::<f32>() / (ny as f32));
+            let u = u + (rng.gen_range(0.0..1.0) / (nx as f32));
+            let v = v + (rng.gen_range(0.0..1.0) / (ny as f32));
             color(&camera.get_ray(u, v), &meshs)
         }).sum::<Vec3>() / (num_sample as f32);
         let gamma = 2;
