@@ -1,4 +1,5 @@
-use std::fs::File;
+use std::ops::Div;
+use std::{fs::File, ops::Add};
 use std::io::Write;
 use nalgebra::{Matrix, Vector3, vector};
 
@@ -14,20 +15,22 @@ impl Ray {
     fn unit_direction(&self) -> Vec3 {
         self.direction.normalize()
     }
-    fn hit(&self, mesh: &dyn RayHitable) -> bool {
+
+    /// return is `Some(t: f32)` where if hit at position `ray.center + t * ray.direction`
+    fn hit(&self, mesh: &dyn RayHitable) -> Option<f32> {
         mesh.hit(&self)
     }
 }
 
 trait RayHitable {
-    fn hit(&self, ray: &Ray) -> bool;
+    fn hit(&self, ray: &Ray) -> Option<f32>;
 }
 struct Sphere {
     center: Vec3,
     radius: f32
 }
 impl RayHitable for Sphere {
-    fn hit(&self, ray: &Ray) -> bool {
+    fn hit(&self, ray: &Ray) -> Option<f32> {
         // (x-cx)^2 + (y-cy)^2 + (z-cz)^2 = r^2 (sphere equation)
         // dot(a, a) = a.x^2 + a.y^2 + a.z^2
         // so define fun dotself(x) = dot(x, x)
@@ -51,7 +54,11 @@ impl RayHitable for Sphere {
         let quadratic_b = Matrix::dot(&center,&ray.direction) * 2.0;
         let quadratic_c = Matrix::dot(&center, &center) - sphere.radius.powi(2);
         let discriminant = quadratic_b.powi(2) - 4.0 * quadratic_a * quadratic_c;
-        discriminant > 0.0
+        if discriminant < 0.0 {
+            return None
+        } else {
+            return Some((-quadratic_b - discriminant.sqrt()) / (2.0 * quadratic_a));
+        }
     }
 }
 
@@ -71,8 +78,10 @@ fn main() {
     let origin: Vec3 = vector![0.0, 0.0, 0.0];
 
     fn color(ray: &Ray) -> Vec3 {
-        if ray.hit(&Sphere { center: vector![0.0, 0.0, -1.0], radius: 0.5 }) {
-            return vector![1.0, 0.0, 0.0];
+        let sphere = Sphere { center: vector![0.0, 0.0, -1.0], radius: 0.5 };
+        if let Some(t) = ray.hit(&sphere) {
+            let n: Vec3 = (ray.point_at_parameter(t) - sphere.center).normalize();
+            return n.add_scalar(1.0) / 2.0; // convert Dr = [-1, 1] to Dr = [0, 1]
         }
         let t = 0.3 * (ray.unit_direction().y + 1.0);
         let white_color = vector![1.0, 1.0, 1.0];
