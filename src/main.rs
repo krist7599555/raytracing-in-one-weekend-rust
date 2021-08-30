@@ -1,6 +1,7 @@
 use std::{fs::File};
 use std::io::Write;
 use nalgebra::{Matrix, Vector3, vector};
+use rand::Rng;
 
 type Vec3 = Vector3<f32>;
 struct Ray {
@@ -87,6 +88,31 @@ impl RayHitable for Model {
     }
 }
 
+struct Camera {
+    pub lower_left_coner: Vec3,
+    pub horizontal: Vec3,
+    pub vertical: Vec3,
+    pub origin: Vec3,
+}
+impl Camera {
+    fn get_ray(&self, u: f32, v: f32) -> Ray {
+        return Ray {
+            origin: self.origin,
+            direction: self.lower_left_coner + u * self.horizontal + v * self.vertical
+        }
+    }
+}
+impl Default for Camera {
+    fn default() -> Self {
+        Self { 
+            lower_left_coner: vector![-2.0, -1.0, -1.0],
+            horizontal: vector![4.0, 0.0, 0.0],
+            vertical: vector![0.0, 2.0, 0.0],
+            origin: vector![0.0, 0.0, 0.0], 
+        }
+    }
+}
+
 fn main() {
     let mut w = File::create("image.ppm").unwrap();
 
@@ -97,10 +123,7 @@ fn main() {
     writeln!(&mut w, "{} {}", nx, ny).unwrap();
     writeln!(&mut w, "{}", 255).unwrap();
 
-    let lower_left_coner: Vec3 = vector![-2.0, -1.0, -1.0];
-    let horizontal: Vec3 = vector![4.0, 0.0, 0.0];
-    let vertical: Vec3 = vector![0.0, 2.0, 0.0];
-    let origin: Vec3 = vector![0.0, 0.0, 0.0];
+    let camera = Camera::default();
 
 
     fn color(ray: &Ray) -> Vec3 {
@@ -126,13 +149,16 @@ fn main() {
         return white_color.lerp(&blue_color, t); // Linear interpolation
     }
 
+    let mut rng = rand::thread_rng();
     for v in (0..ny).map(|i| i as f32 / ny as f32).rev() {
     for u in (0..nx).map(|i| i as f32 / nx as f32) {
-        let ray = Ray {
-            origin, 
-            direction: lower_left_coner + u * horizontal + v * vertical
-        };
-        let rgb: Vec3 = color(&ray).map(|f| (f * 255.99).floor());
+        let num_sample = 10;
+        let average_color = (0..num_sample).map(|_| {
+            let u = u + (rng.gen::<f32>() / (nx as f32));
+            let v = v + (rng.gen::<f32>() / (ny as f32));
+            color(&camera.get_ray(u, v))
+        }).sum::<Vec3>() / (num_sample as f32);
+        let rgb: Vec3 = average_color.map(|f| (f * 255.99).floor());
         writeln!(&mut w, "{:.0} {:.0} {:.0}", rgb.x, rgb.y, rgb.z).unwrap();
     }}
 }
