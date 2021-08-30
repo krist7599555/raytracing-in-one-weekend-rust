@@ -113,6 +113,33 @@ impl Default for Camera {
     }
 }
 
+/// crerate unsmooth texture
+fn random_in_unit_sphere() -> Vec3 {
+    let mut rng = rand::thread_rng();
+    loop {
+        let p: Vec3 = vector![rng.gen::<f32>(), rng.gen::<f32>(), rng.gen::<f32>()].add_scalar(-0.5) * 2.0;
+        if p.magnitude_squared() < 1.0 {
+            return p;
+        }
+    }
+}
+
+fn color(ray: &Ray, meshs: &Vec<Box<&dyn RayHitable>>) -> Vec3 {
+    // if let Some(hit) = ray.hit(&sphere) {
+    if let Some(hit) = ray.hits(&mut meshs.iter()) {
+        let target = hit.position + hit.normal + random_in_unit_sphere() * 0.5;
+        let recursive_color = 0.5 * color(&Ray {
+            origin: hit.position,
+            direction: target - hit.position
+        }, &meshs);
+        return recursive_color
+    }
+    let t = 0.3 * (ray.direction.normalize().y + 1.0);
+    let white_color = vector![1.0, 1.0, 1.0];
+    let blue_color = vector![0.5, 0.7, 1.0];
+    return white_color.lerp(&blue_color, t); // Linear interpolation
+}
+
 fn main() {
     let mut w = File::create("image.ppm").unwrap();
 
@@ -124,7 +151,6 @@ fn main() {
     writeln!(&mut w, "{}", 255).unwrap();
 
     let camera = Camera::default();
-
 
     let sphere = Sphere { center: vector![0.0, 0.0, -1.0], radius: 0.5 };
     let sphere2 = Sphere { center: vector![1.0, 0.0, -1.0], radius: 0.5 };
@@ -138,25 +164,15 @@ fn main() {
         Box::new(&sphere4),
         Box::new(&Model {})
     ];
-    let color = |ray: &Ray| -> Vec3 {
-        // if let Some(hit) = ray.hit(&sphere) {
-        if let Some(hit) = ray.hits(&mut meshs.iter()) {
-            return hit.normal.add_scalar(1.0) / 2.0; // convert Dr = [-1, 1] to Dr = [0, 1]
-        }
-        let t = 0.3 * (ray.direction.normalize().y + 1.0);
-        let white_color = vector![1.0, 1.0, 1.0];
-        let blue_color = vector![0.5, 0.7, 1.0];
-        return white_color.lerp(&blue_color, t); // Linear interpolation
-    };
 
-    let mut rng = rand::thread_rng();
     for v in (0..ny).map(|i| i as f32 / ny as f32).rev() {
     for u in (0..nx).map(|i| i as f32 / nx as f32) {
         let num_sample = 10;
+        let mut rng = rand::thread_rng();
         let average_color = (0..num_sample).map(|_| {
             let u = u + (rng.gen::<f32>() / (nx as f32));
             let v = v + (rng.gen::<f32>() / (ny as f32));
-            color(&camera.get_ray(u, v))
+            color(&camera.get_ray(u, v), &meshs)
         }).sum::<Vec3>() / (num_sample as f32);
         let rgb: Vec3 = average_color.map(|f| (f * 255.99).floor());
         writeln!(&mut w, "{:.0} {:.0} {:.0}", rgb.x, rgb.y, rgb.z).unwrap();
