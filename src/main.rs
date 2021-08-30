@@ -126,19 +126,19 @@ fn main() {
     let camera = Camera::default();
 
 
-    fn color(ray: &Ray) -> Vec3 {
-        let sphere = Sphere { center: vector![0.0, 0.0, -1.0], radius: 0.5 };
-        let sphere2 = Sphere { center: vector![1.0, 0.0, -1.0], radius: 0.5 };
-        let sphere3 = Sphere { center: vector![0.0, 1.0, -1.0], radius: 0.2 };
-        let sphere4 = Sphere { center: vector![0.0, -100.5, -1.0], radius: 100.0 };
+    let sphere = Sphere { center: vector![0.0, 0.0, -1.0], radius: 0.5 };
+    let sphere2 = Sphere { center: vector![1.0, 0.0, -1.0], radius: 0.5 };
+    let sphere3 = Sphere { center: vector![0.0, 1.0, -1.0], radius: 0.2 };
+    let sphere4 = Sphere { center: vector![0.0, -100.5, -1.0], radius: 100.0 };
 
-        let meshs: Vec<Box<&dyn RayHitable>> = vec![
-            Box::new(&sphere),
-            Box::new(&sphere2),
-            Box::new(&sphere3),
-            Box::new(&sphere4),
-            Box::new(&Model {})
-        ];
+    let meshs: Vec<Box<&dyn RayHitable>> = vec![
+        Box::new(&sphere),
+        Box::new(&sphere2),
+        Box::new(&sphere3),
+        Box::new(&sphere4),
+        Box::new(&Model {})
+    ];
+    let color = |ray: &Ray| -> Vec3 {
         // if let Some(hit) = ray.hit(&sphere) {
         if let Some(hit) = ray.hits(&mut meshs.iter()) {
             return hit.normal.add_scalar(1.0) / 2.0; // convert Dr = [-1, 1] to Dr = [0, 1]
@@ -147,7 +147,7 @@ fn main() {
         let white_color = vector![1.0, 1.0, 1.0];
         let blue_color = vector![0.5, 0.7, 1.0];
         return white_color.lerp(&blue_color, t); // Linear interpolation
-    }
+    };
 
     let mut rng = rand::thread_rng();
     for v in (0..ny).map(|i| i as f32 / ny as f32).rev() {
