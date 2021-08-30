@@ -14,6 +14,27 @@ impl Ray {
     fn unit_direction(&self) -> Vec3 {
         self.direction.normalize()
     }
+    fn hit(&self, mesh: &dyn RayHitable) -> bool {
+        mesh.hit(&self)
+    }
+}
+
+trait RayHitable {
+    fn hit(&self, ray: &Ray) -> bool;
+}
+struct Sphere {
+    center: Vec3,
+    radius: f32
+}
+impl RayHitable for Sphere {
+    fn hit(&self, ray: &Ray) -> bool {
+        let oc = ray.origin - self.center;
+        let a = ray.direction.dot(&ray.direction);
+        let b = 2.0 * oc.dot(&ray.direction);
+        let c = oc.dot(&oc) - self.radius.powi(2);
+        let discriminant = b * b - 4.0 * a * c;
+        discriminant > 0.0
+    }
 }
 
 fn main() {
@@ -32,14 +53,17 @@ fn main() {
     let origin: Vec3 = vector![0.0, 0.0, 0.0];
 
     fn color(ray: &Ray) -> Vec3 {
+        if ray.hit(&Sphere { center: vector![0.0, 0.0, -1.0], radius: 0.5 }) {
+            return vector![1.0, 0.0, 0.0];
+        }
         let t = 0.3 * (ray.unit_direction().y + 1.0);
         let white_color = vector![1.0, 1.0, 1.0];
         let blue_color = vector![0.5, 0.7, 1.0];
         return white_color.lerp(&blue_color, t); // Linear interpolation
     }
 
-    for u in (0..ny).map(|i| i as f32 / ny as f32).rev() {
-    for v in (0..nx).map(|i| i as f32 / nx as f32) {
+    for v in (0..ny).map(|i| i as f32 / ny as f32).rev() {
+    for u in (0..nx).map(|i| i as f32 / nx as f32) {
         let ray = Ray {
             origin, 
             direction: lower_left_coner + u * horizontal + v * vertical
