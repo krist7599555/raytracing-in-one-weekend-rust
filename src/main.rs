@@ -44,7 +44,7 @@ fn main() {
     writeln!(&mut w, "{} {}", nx, ny).unwrap();
     writeln!(&mut w, "{}", 255).unwrap();
 
-    let camera = Camera::new(90.0, nx as f32 / ny as f32);
+    let camera = Camera::new(&vector![-2.0, 2.0, 1.0], &vector![0.0, 0.0, -1.0], &vector![0.0, 1.0, 0.0], 90.0, nx as f32 / ny as f32);
 
     let sphere  = Mesh { geometry: &Sphere { center: vector![0.0, 0.0, -1.0], radius: 0.5 }, material: &Lambertian::new(vector![0.1, 0.2, 0.5]) };
     let sphere2 = Mesh { geometry: &Sphere { center: vector![0.0, -100.5, -1.0], radius: 100.0 }, material: &Lambertian::new(vector![0.8, 0.8, 0.0]) };
@@ -59,13 +59,13 @@ fn main() {
 
 
     let meshs: Vec<Box<&Mesh>> = vec![
-        // Box::new(&sphere),
-        // Box::new(&sphere2),
-        // Box::new(&sphere3),
-        // Box::new(&sphere4),
-        // Box::new(&sphere5),
-        Box::new(&blue_ball),
-        Box::new(&red_ball),
+        Box::new(&sphere),
+        Box::new(&sphere2),
+        Box::new(&sphere3),
+        Box::new(&sphere4),
+        Box::new(&sphere5),
+        // Box::new(&blue_ball),
+        // Box::new(&red_ball),
     ];
 
     let profile_time = std::time::Instant::now();

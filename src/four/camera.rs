@@ -11,23 +11,28 @@ pub struct Camera {
   pub origin: Vec3,
 }
 impl Camera {
-  pub fn get_ray(&self, u: f32, v: f32) -> Ray {
+  pub fn get_ray(&self, s: f32, t: f32) -> Ray {
       return Ray {
           origin: self.origin,
-          direction: self.lower_left_coner + u * self.horizontal + v * self.vertical
+          direction: self.lower_left_coner + s * self.horizontal + t * self.vertical - self.origin,
       }
   }
   /// `fovy` as `width / height`<br>
   /// `asspect` as `width / height`
-  pub fn new(fovy: f32, aspect: f32) -> Self {
+  pub fn new(lookfrom: &Vec3, lookat: &Vec3, up: &Vec3, fovy: f32, aspect: f32) -> Self {
       let theta = fovy * PI / 180.0;
       let half_height = (theta / 2.0).tan();
       let half_width = aspect * half_height;
+
+      let w = (lookfrom - lookat).normalize();
+      let u = up.cross(&w).normalize();
+      let v = w.cross(&u);
+
       Self { 
-          lower_left_coner: vector![-half_width, -half_height, -1.0],
-          horizontal: vector![2.0 * half_width, 0.0, 0.0],
-          vertical: vector![0.0, 2.0 * half_height, 0.0],
-          origin: vector![0.0, 0.0, 0.0], 
+          lower_left_coner: lookfrom - half_width * u - half_height * v - w,
+          horizontal: 2.0 * half_width * u,
+          vertical: 2.0 * half_height * v,
+          origin: lookfrom.to_owned(), 
       }
   }
 }
