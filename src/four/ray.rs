@@ -1,6 +1,4 @@
-use super::mesh::{HitRecord, Rayable};
-use super::{Geometry, Material, Mesh};
-use crate::Vec3;
+use super::{Material, Vec3};
 
 pub struct Ray {
   pub origin:    Vec3,
@@ -13,9 +11,22 @@ impl Ray {
   /// ray.direction`
   pub fn hit<'a>(&self, mesh: &'a dyn Rayable) -> Option<HitRecord<'a>> { mesh.hit(&self) }
 
-  pub fn hits<'a>(&self, meshs: &mut dyn Iterator<Item = &'a dyn Rayable>) -> Option<HitRecord<'a>> {
+  pub fn hits<'a>(
+    &self, meshs: &mut dyn Iterator<Item = &'a dyn Rayable>,
+  ) -> Option<HitRecord<'a>> {
     meshs
       .filter_map(|b| self.hit(b))
       .min_by(|a, b| a.t.partial_cmp(&b.t).unwrap_or(std::cmp::Ordering::Equal))
   }
+}
+
+pub trait Rayable {
+  fn hit<'a>(&'a self, ray: &Ray) -> Option<HitRecord<'a>>;
+}
+
+pub struct HitRecord<'a> {
+  pub t:        f32,
+  pub position: Vec3,
+  pub normal:   Vec3,
+  pub material: &'a dyn Material,
 }

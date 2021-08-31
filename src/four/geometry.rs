@@ -1,15 +1,7 @@
-use nalgebra::Matrix;
-
 use super::{Ray, Vec3};
 
 pub trait Geometry {
   fn hit(&self, ray: &Ray) -> Option<HitRecordGeometric>;
-}
-
-impl core::fmt::Debug for dyn Geometry {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Geometry{{}}")
-    }
 }
 
 #[derive(Debug, Clone)]

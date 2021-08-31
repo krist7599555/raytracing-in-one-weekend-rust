@@ -1,6 +1,6 @@
 use nalgebra::vector;
 
-use super::mesh::HitRecord;
+use super::ray::HitRecord;
 use super::utils::random_in_unit_sphere;
 use super::{Ray, Vec3};
 

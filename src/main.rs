@@ -1,9 +1,8 @@
 mod four;
-use std::f32::consts::PI;
 use std::fs::File;
 use std::io::Write;
 
-use four::{Geometry, Material, MaterialScatter, Mesh, Ray, Rayable, Vec3, random_in_unit_sphere};
+use four::{random_in_unit_sphere, MaterialScatter, Mesh, Ray, Rayable, Vec3};
 use nalgebra::vector;
 use rand::Rng;
 
@@ -43,7 +42,7 @@ fn color(ray: &Ray, meshs: &Vec<&dyn Rayable>, depth: u32) -> Vec3 {
 
 fn main() {
   let mut w = File::create("image.ppm").unwrap();
-  let prod = true;
+  let prod = false;
 
   let nx = 200 * (if prod { 5 } else { 1 });
   let ny = 100 * (if prod { 5 } else { 1 });
@@ -85,16 +84,6 @@ fn main() {
     Dielectric::new(1.0 / 1.5),
   );
 
-  let r = (PI / 4.0).cos();
-  let blue_ball = Mesh::new(
-    Sphere::new(vector![-r, 0., -1.], r),
-    Lambertian::new(vector![0., 0., 1.]),
-  );
-  let red_ball = Mesh::new(
-    Sphere::new(vector![r, 0., -1.], r),
-    Lambertian::new(vector![1., 0., 0.]),
-  );
-
   let mut meshs: Vec<Box<dyn Rayable>> = vec![
     Box::new(sphere),
     Box::new(sphere2),
@@ -107,15 +96,26 @@ fn main() {
   for _ in 0..30 {
     let r = 0.15;
     let mesh = Mesh::new(
-      Sphere::new(vector![rnd.gen_range(-3.0..3.0), -0.5 + r, rnd.gen_range(-3.0..3.0)], r),
-      Lambertian::new(vector![rnd.gen_range(0.0..1.0), rnd.gen_range(0.0..1.0), rnd.gen_range(0.0..1.0)]),
+      Sphere::new(
+        vector![rnd.gen_range(-3.0..3.0), -0.5 + r, rnd.gen_range(-3.0..3.0)],
+        r,
+      ),
+      Lambertian::new(vector![
+        rnd.gen_range(0.0..1.0),
+        rnd.gen_range(0.0..1.0),
+        rnd.gen_range(0.0..1.0)
+      ]),
     );
     meshs.push(Box::new(mesh))
   }
 
   let profile_time = std::time::Instant::now();
   for v in (0..ny).map(|i| i as f32 / ny as f32).rev() {
-    println!("process = {:.2}, time = {:.2}s", 1.0 - v, profile_time.elapsed().as_secs());
+    println!(
+      "process = {:.2}, time = {:.2}s",
+      1.0 - v,
+      profile_time.elapsed().as_secs()
+    );
     for u in (0..nx).map(|i| i as f32 / nx as f32) {
       let num_sample = 1 * (if prod { 10 } else { 1 });
       let mut rng = rand::thread_rng();
@@ -123,10 +123,7 @@ fn main() {
         .map(|_| {
           let u = u + (rng.gen_range(0.0..1.0) / (nx as f32));
           let v = v + (rng.gen_range(0.0..1.0) / (ny as f32));
-          let meshs = meshs
-            .iter()
-            .map(|i| &**i)
-            .collect::<Vec<_>>();
+          let meshs = meshs.iter().map(|i| &**i).collect::<Vec<_>>();
           color(&camera.get_ray(u, v), &meshs, 0)
         })
         .sum::<Vec3>()
