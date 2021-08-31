@@ -1,0 +1,22 @@
+version = "Two"
+tab_spaces = 2
+# https://rust-lang.github.io/rustfmt/?version=v1.4.36&search=#indent_style
+# indent_style = "Visual"
+indent_style = "Block"
+struct_field_align_threshold = 20
+where_single_line = true
+wrap_comments = true
+reorder_modules = true
+group_imports = "StdExternalCrate"
+reorder_imports = true
+reorder_impl_items = true
+overflow_delimited_expr = true
+normalize_doc_attributes = true
+newline_style = "Unix"
+merge_imports = true
+imports_granularity = "Module"
+# https://rust-lang.github.io/rustfmt/?version=v1.4.36&search=#overflow_delimited_expr
+imports_layout = "Horizontal"
+fn_single_line = true
+fn_args_layout = "Compressed"
+# https://rust-lang.github.io/rustfmt/?version=v1.4.36&search=#fn_args_layout

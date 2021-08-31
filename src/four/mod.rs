@@ -1,12 +1,12 @@
 mod camera;
 pub use camera::Camera;
 mod geometry;
-pub use geometry::{ Sphere, Geometry };
+pub use geometry::{Geometry, Sphere};
 mod material;
-pub use material::{ Material, Lambertian, Metal, MaterialScatter, Dielectric };
+pub use material::{Dielectric, Lambertian, Material, MaterialScatter, Metal};
 mod mesh;
-pub use mesh::{ Mesh, HitRecord };
+pub use mesh::{HitRecord, Mesh};
 mod ray;
-pub use ray::{ Ray };
+pub use ray::Ray;
 mod utils;
-pub use utils::{Vec3, random_in_unit_sphere};
+pub use utils::{random_in_unit_sphere, Vec3};
