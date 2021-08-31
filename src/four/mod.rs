@@ -5,7 +5,7 @@ pub use geometry::{Geometry, Sphere};
 mod material;
 pub use material::{Dielectric, Lambertian, Material, MaterialScatter, Metal};
 mod mesh;
-pub use mesh::{HitRecord, Mesh};
+pub use mesh::{HitRecord, Mesh, Rayable};
 mod ray;
 pub use ray::Ray;
 mod utils;

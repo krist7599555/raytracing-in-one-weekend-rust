@@ -7,6 +7,12 @@ use super::{Ray, Vec3};
 pub trait Material {
   fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<MaterialScatter>;
 }
+
+impl core::fmt::Debug for dyn Material {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+      write!(f, "Material{{}}")
+  }
+}
 pub struct MaterialScatter {
   pub attenuation: Vec3,
   pub scattered:   Ray,

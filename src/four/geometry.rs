@@ -6,19 +6,29 @@ pub trait Geometry {
   fn hit(&self, ray: &Ray) -> Option<HitRecordGeometric>;
 }
 
+impl core::fmt::Debug for dyn Geometry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Geometry{{}}")
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct HitRecordGeometric {
   pub t:        f32,
   pub position: Vec3,
   pub normal:   Vec3,
 }
 
+#[derive(Clone, Debug)]
 pub struct Sphere {
   pub center: Vec3,
   pub radius: f32,
 }
+
 impl Sphere {
   pub fn new(center: Vec3, radius: f32) -> Self { return Self { center, radius }; }
 }
+
 impl Geometry for Sphere {
   /// `(x-cx)² + (y-cy)² + (z-cz)² = r²` (sphere equation)<br>
   /// so define
