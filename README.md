@@ -1,3 +1,5 @@
+![image](output/23min.png)
+
 hard :( god book unable to read https://pbr-book.org/3ed-2018/contents
 
 ref https://github.com/perliedman/raytracing-in-one-weekend
