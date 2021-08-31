@@ -3,7 +3,7 @@ pub use camera::Camera;
 mod geometry;
 pub use geometry::{ Sphere, Geometry };
 mod material;
-pub use material::{ Material, Lambertian, Metal, MaterialScatter };
+pub use material::{ Material, Lambertian, Metal, MaterialScatter, Dielectric };
 mod mesh;
 pub use mesh::{ Mesh, HitRecord };
 mod ray;
