@@ -44,7 +44,9 @@ fn main() {
     writeln!(&mut w, "{} {}", nx, ny).unwrap();
     writeln!(&mut w, "{}", 255).unwrap();
 
-    let camera = Camera::new(&vector![-2.0, 2.0, 1.0], &vector![0.0, 0.0, -1.0], &vector![0.0, 1.0, 0.0], 90.0, nx as f32 / ny as f32);
+    let lookfrom = vector![3.0, 3.0, 2.0];
+    let lookat = vector![0.0, 0.0, -1.0];
+    let camera = Camera::new(&lookfrom, &lookat, &vector![0.0, 1.0, 0.0], 20.0, nx as f32 / ny as f32, 1.0, (lookfrom - lookat).magnitude());
 
     let sphere  = Mesh { geometry: &Sphere { center: vector![0.0, 0.0, -1.0], radius: 0.5 }, material: &Lambertian::new(vector![0.1, 0.2, 0.5]) };
     let sphere2 = Mesh { geometry: &Sphere { center: vector![0.0, -100.5, -1.0], radius: 100.0 }, material: &Lambertian::new(vector![0.8, 0.8, 0.0]) };
@@ -71,7 +73,7 @@ fn main() {
     let profile_time = std::time::Instant::now();
     for v in (0..ny).map(|i| i as f32 / ny as f32).rev() {
     for u in (0..nx).map(|i| i as f32 / nx as f32) {
-        let num_sample = 6;
+        let num_sample = 16;
         let mut rng = rand::thread_rng();
         let average_color = (0..num_sample).map(|_| {
             let u = u + (rng.gen_range(0.0..1.0) / (nx as f32));
