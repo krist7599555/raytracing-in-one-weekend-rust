@@ -1,4 +1,5 @@
 mod four;
+use std::f32::consts::PI;
 use std::{fs::File};
 use std::io::Write;
 use four::{Mesh, Ray, Vec3};
@@ -43,22 +44,31 @@ fn main() {
     writeln!(&mut w, "{} {}", nx, ny).unwrap();
     writeln!(&mut w, "{}", 255).unwrap();
 
-    let camera = Camera::default();
+    let camera = Camera::new(90.0, nx as f32 / ny as f32);
 
     let sphere  = Mesh { geometry: &Sphere { center: vector![0.0, 0.0, -1.0], radius: 0.5 }, material: &Lambertian::new(vector![0.1, 0.2, 0.5]) };
     let sphere2 = Mesh { geometry: &Sphere { center: vector![0.0, -100.5, -1.0], radius: 100.0 }, material: &Lambertian::new(vector![0.8, 0.8, 0.0]) };
     let sphere3 = Mesh { geometry: &Sphere { center: vector![1.0, 0.0, -1.0], radius: 0.5 }, material: &Metal::new(vector![0.8, 0.6, 0.2], 0.0) };
     let sphere4 = Mesh { geometry: &Sphere { center: vector![-1.0, 0.0, -1.0], radius: 0.5 }, material: &Dielectric::new(1.5) };
-    let sphere5 = Mesh { geometry: &Sphere { center: vector![-1.0, 0.0, -1.0], radius: 0.45 }, material: &Dielectric::new(1.0 / 1.5) };
+    let sphere5 = Mesh { geometry: &Sphere { center: vector![-1.0, 0.0, -1.0], radius: 0.35 }, material: &Dielectric::new(1.0 / 1.5) };
+
+    let r = (PI / 4.0).cos();
+    let blue_ball = Mesh { geometry: &Sphere::new(vector![-r, 0., -1.], r), material: &Lambertian::new(vector![0., 0., 1.]) };
+    let red_ball  = Mesh { geometry: &Sphere::new(vector![ r, 0., -1.], r), material: &Lambertian::new(vector![1., 0., 0.]) };
+
+
 
     let meshs: Vec<Box<&Mesh>> = vec![
-        Box::new(&sphere),
-        Box::new(&sphere2),
-        Box::new(&sphere3),
-        Box::new(&sphere4),
-        Box::new(&sphere5),
+        // Box::new(&sphere),
+        // Box::new(&sphere2),
+        // Box::new(&sphere3),
+        // Box::new(&sphere4),
+        // Box::new(&sphere5),
+        Box::new(&blue_ball),
+        Box::new(&red_ball),
     ];
 
+    let profile_time = std::time::Instant::now();
     for v in (0..ny).map(|i| i as f32 / ny as f32).rev() {
     for u in (0..nx).map(|i| i as f32 / nx as f32) {
         let num_sample = 6;
@@ -74,4 +84,6 @@ fn main() {
             .map(|f| (f * 255.99).floor());
         writeln!(&mut w, "{:.0} {:.0} {:.0}", rgb.x, rgb.y, rgb.z).unwrap();
     }}
+    println!("time use per pixel = {:?}", profile_time.elapsed() / (ny * nx));
+    println!("total time = {:?}", profile_time.elapsed());
 }

@@ -16,6 +16,13 @@ pub struct Sphere {
   pub center: Vec3,
   pub radius: f32
 }
+impl Sphere {
+  pub fn new(center: Vec3, radius: f32) -> Self {
+    return Self {
+      center, radius
+    }
+  }
+}
 impl Geometry for Sphere {
   /// `(x-cx)² + (y-cy)² + (z-cz)² = r²` (sphere equation)<br>
   /// so define 
@@ -47,6 +54,7 @@ impl Geometry for Sphere {
   ///  = 2 (b +/- sqrt(b²-ac) / a)
   ///    ^remove 2
   /// ```
+  #[allow(non_snake_case)]
   fn hit(&self, ray: &Ray) -> Option<HitRecordGeometric> {
       let (A, B, C, r): _ = (&ray.origin, &ray.direction, &self.center, &self.radius);
       let a = B.dot(B);
